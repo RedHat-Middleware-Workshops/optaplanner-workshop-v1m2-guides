@@ -1,0 +1,12 @@
+config:
+    renderer: markdown
+
+modules:
+  intro:
+    name: Introduction
+  easy-java-score-calculator:
+    name: Easy Java Score Calculator
+  drools-score-calculator:
+    name: Drools Score Calculator
+  finish:
+    name: Conclusion
