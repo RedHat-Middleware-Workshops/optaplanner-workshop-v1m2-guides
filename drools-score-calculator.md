@@ -36,7 +36,33 @@ public List<CloudComputer> getComputerList() {
 With the proper annotations set, we can start implementing our first rule. As Drools is a quite specific language, which would justify a full workshop on its own, we will not ask you to implement these rules yourself. Instead, we will provide you the constraint rules and will explain how they work.
 
 
-1. Open the `cloudBalancingScoreRules.drl` file you just created.
+1. Open the `cloudBalancingScoreRules.drl` file you just created. We first need to define a `package` for our rules. Add the following line to the top of the file:
+```
+package org.optaplanner.examples.cloudbalancing.solver;
+```
+
+2. The Drools rule engine works with Java objects as _Facts_. In order to be able to use Java objects in a rule, we need to import them into the `.drl` file. To write our constraints, we need to evaluate the following _Fact types_:
+    - `CloudProcess`
+    - `CloudComputer`
+    - `HardSoftScoreHolder`
+
+    The `ScoreHolder` is required to allow us to change the score of our solution when a rule matches and fires. Add the following lines to your `.drl` file:
+
+```
+import org.optaplanner.core.api.score.buildin.hardsoft.HardSoftScoreHolder;
+
+import org.optaplanner.examples.cloudbalancing.domain.CloudComputer;
+import org.optaplanner.examples.cloudbalancing.domain.CloudProcess;
+
+```
+
+3. We need access to the `ScoreHolder` in order to manipulate it. The `ScoreHolder` however is not a _Fact_, as it is not part of the _condition_ of any of our constraint rules. Drools allows us to make this kind of data accessible to the rules via _global variables_. These _variables_ are accessible by the rules, but are not reasoned over during rule evaluation. OptaPlanner will automatically insert this _global_ `ScoreHolder` _variable_ into the rules engine when we define this variable in our rules file. Add the following line to your `.drl` file:
+
+```
+global HardSoftScoreHolder scoreHolder;
+```
+
+4. 
 
 
 
