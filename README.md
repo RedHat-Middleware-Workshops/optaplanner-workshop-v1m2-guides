@@ -1,6 +1,6 @@
-OptaPlanner Workshop Module 1
+OptaPlanner Workshop Module 2
 ===
-This is `module 1` of a full-day hands-on OptaPlanner / Red Hat Business Optimizer workshop. Business Optimizer is the A.I. Constraint Solver technology of Red Hat Decision Manager.
+This is `module 2` of a full-day hands-on OptaPlanner / Red Hat Business Optimizer workshop. Business Optimizer is the A.I. Constraint Solver technology of Red Hat Decision Manager.
 
 This workshop provides developers and architects an introduction to planning problems, A.I. constraints solvers, and more spefically, how OptaPlanner can find optimal solutions to these kind of problems. We'll demonstrate how OptaPlanner's solutions to these kind of problems is far superiour than solutions created by humans or traditional algorithms, and how these solutions can bring a strategical advantage to its users.
 
@@ -21,17 +21,17 @@ Note that if you have installed the lab infra via APB, the lab instructions are 
 
 Here is an example Ansible playbook to deploy the lab instruction to your OpenShift cluster manually.
 ```
-- name: Create Guides Module 1
+- name: Create Guides Module 2
   hosts: localhost
   tasks:
   - import_role:
       name: siamaksade.openshift_workshopper
     vars:
-      project_name: "guide-m1"
-      workshopper_name: "OptaPlanner Workshop V1 Module-1"
+      project_name: "guide-m2"
+      workshopper_name: "OptaPlanner Workshop V1 Module-2"
       project_suffix: "-XX"
-      workshopper_content_url_prefix: https://raw.githubusercontent.com/RedHat-Middleware-Workshops/optaplanner-workshop-v1m1-guides/master
-      workshopper_workshop_urls: https://raw.githubusercontent.com/RedHat-Middleware-Workshops/optaplanner-workshop-v1m1-guides/master/_optaplanner-workshop-module1.yml
+      workshopper_content_url_prefix: https://raw.githubusercontent.com/RedHat-Middleware-Workshops/optaplanner-workshop-v1m2-guides/master
+      workshopper_workshop_urls: https://raw.githubusercontent.com/RedHat-Middleware-Workshops/optaplanner-workshop-v1m2-guides/master/_optaplanner-workshop-module1.yml
       workshopper_env_vars:
         PROJECT_SUFFIX: "-XX"
         COOLSTORE_PROJECT: coolstore{{ project_suffix }}
