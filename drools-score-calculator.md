@@ -214,4 +214,4 @@ rule "computerCost"
 end
 ~~~
 
-You've successfully implemented your _hard constraints_ and _soft constraints_ in Drools. In the next module of this workshop we will look at the OptaPlanner _Benchmark_. This component allows us to benchmark various `ScoreCalculator` and heuristic algorithm combinations, as well as how they perform against different data-sets. This allows us to both validate our problem space/size, our implementation and the optimal configuration of algorithms for the given planning problem.
+You've successfully implemented your _hard constraints_ and _soft constraints_ in Drools. In the next part of the lab, we will implement the same constraints with the OptaPlanner _Constraint Streams_ API. The _Constraint Streams_ API allows developers to write OptaPlanner constraints in a Java 8 Streams like, functional programming, paradigm. This reduces the learning curve of writing constraints. At the same time, these constraint streams are transpiled to the Drools Canonical Model, therefore using the high-performant Drools rules engine for constraint evaluation at runtime.
