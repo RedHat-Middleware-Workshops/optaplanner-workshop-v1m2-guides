@@ -25,42 +25,44 @@ DRL is a declarative rules language, as opposed to imperative languages like Jav
 The engine reasons over _Facts_ (data objects) that are inserted into the _Session_ or _Working Memory_ of the engine. In the case of OptaPlanner this means that we need to insert all the objects of our problem into the rules engine, i.e. all our `CloudProcess` and `CloudComputer` instances. This makes our data available for evaluation. _Planning Entities_ are inserted into the rules engine by OptaPlanner automatically. However, we do need to insert all other facts that we want to make available to our rules. For this, OptaPlanner provides the `@ProblemFactCollectionProperty` annotation. We can annotate the _getter methods_ in our `PlanningSolution` class, that return a `Collection` that we want to insert into our rule engine, with this annotation.
 
 1. Open the `CloudBalance` class and locate the `getComputerList` method. Annotate this method with the `@ProblemFactCollectionProperty`:
-```
+
+~~~java
 @ProblemFactCollectionProperty
 @ValueRangeProvider(id = "computerRange")
 public List<CloudComputer> getComputerList() {
 	return computerList;
 }
-```
+~~~
 
 With the proper annotations set, we can start implementing our first rule. As Drools is a quite specific language, which would justify a full workshop on its own, we will not ask you to implement these rules yourself. Instead, we will provide you the constraint rules and will explain how they work.
 
 
 1. Open the `cloudBalancingScoreRules.drl` file you just created. We first need to define a `package` for our rules. Add the following line to the top of the file:
-```
+
+~~~java
 package org.optaplanner.examples.cloudbalancing.solver;
-```
+~~~
 
 2. The Drools rule engine works with Java objects as _Facts_. In order to be able to use Java objects in a rule, we need to import them into the `.drl` file. To write our constraints, we need to evaluate the following _Fact types_:
+
     - `CloudProcess`
     - `CloudComputer`
     - `HardSoftScoreHolder`
 
     The `ScoreHolder` is required to allow us to change the score of our solution when a rule matches and fires. Add the following lines to your `.drl` file:
 
-```
+~~~java
 import org.optaplanner.core.api.score.buildin.hardsoft.HardSoftScoreHolder;
 
 import org.optaplanner.examples.cloudbalancing.domain.CloudComputer;
 import org.optaplanner.examples.cloudbalancing.domain.CloudProcess;
-
-```
+~~~
 
 3. We need access to the `ScoreHolder` in order to manipulate it. The `ScoreHolder` however is not a _Fact_, as it is not part of the _condition_ of any of our constraint rules. Drools allows us to make this kind of data accessible to the rules via _global variables_. These _variables_ are accessible by the rules, but are not reasoned over during rule evaluation. OptaPlanner will automatically insert this _global_ `ScoreHolder` _variable_ into the rules engine when we define this variable in our rules file. Add the following line to your `.drl` file:
 
-```
+~~~java
 global HardSoftScoreHolder scoreHolder;
-```
+~~~
 
 With our package name, imports and global variable definitions in place, we can now start implementing our constraint rules. We will start by implementing the constraint rule for the `cpuPower` _hard constraint_. After implementing that constraint we will ask you to implement the other 2 _hard constraints_ in a similar way. Finally we wil implement the _soft constraint_ that aims to minimize the `cost` of the solution.
 
@@ -71,18 +73,18 @@ A rule in Drools consist of 3 parts:
 
 As stated earlier, a Drools rule implements a _when-then_ semantic. The syntax of a rule looks like this:
 
-```
+~~~
 rule {name}
 when
   {conditions}
 then
   {action}
 end
-```
+~~~
 
 The hard constraint we're going to implement is the constraint that verifies that the computer's available `cpuPower` is not exceeded by the processes assigned to it. The rule that implements that constraint is the following:
 
-```
+~~~
 rule "requiredCpuPowerTotal"
     when
         $computer : CloudComputer($cpuPower : cpuPower)
@@ -96,7 +98,7 @@ rule "requiredCpuPowerTotal"
     then
         scoreHolder.addHardConstraintMatch(kcontext, $cpuPower - $requiredCpuPowerTotal);
 end
-```
+~~~
 
 Let's first explain the _left-hand-side_ of the rule. The first line matches on eveyr `CloudComputer` _Fact_. The `$computer :` and `$cpuPower :` are variable assignments. This allows us to later reference the `CloudComputer` and its `cpuPower` attribute in another constraint, or in the action part of our rule.
 
@@ -107,27 +109,28 @@ In the action part, the consequence that fires when the rule matches, we call th
 1. Add the rule to your `.drl` file and save it.
 
 2. Open your `cloudBalancingSolverConfig.xml` file. In order to use the _Drools Score Calculator_, we need to configure the `scoreDrl` our `scoreDirectorFactory`. Configure the `scoreDirectorFactory` as follow and save the file (note that we've commented out the `easyScoreCalculatorClass`):
-```
+
+~~~xml
 <scoreDirectorFactory>
     <!--
     <easyScoreCalculatorClass>org.optaplanner.examples.cloudbalancing.optional.score.CloudBalancingEasyScoreCalculator</easyScoreCalculatorClass>
     -->
     <scoreDrl>org/optaplanner/examples/cloudbalancing/solver/cloudBalancingScoreRules.drl</scoreDrl>
   </scoreDirectorFactory>
-```
+~~~
 
-3. Run the `CloudBalancingSolveTest` by running a Maven Build. The output should show the test being executed.
-
-
+3. Run the `CloudBalancingSolverTest` by running a Maven Build. The output should show the test being executed.
 
 
 
+~~~
+
+Bla
 
 
 
 
-
-
+~~~
 
 
 
@@ -136,7 +139,7 @@ In the action part, the consequence that fires when the rule matches, we call th
 
 Your final `.drl` file should look like this:
 
-```
+~~~
 package org.optaplanner.examples.cloudbalancing.solver;
 
 import org.optaplanner.core.api.score.buildin.hardsoft.HardSoftScoreHolder;
@@ -204,7 +207,6 @@ rule "computerCost"
     then
         scoreHolder.addSoftConstraintMatch(kcontext, - $cost);
 end
-
-```
+~~~
 
 You've successfully implemented your _hard constraints_ and _soft constraints_ in Drools. In the next module of this workshop we will look at the OptaPlanner _Benchmark_. This component allows us to benchmark various `ScoreCalculator` and heuristic algorithm combinations, as well as how they perform against different data-sets. This allows us to both validate our problem space/size, our implementation and the optimal configuration of algorithms for the given planning problem.
