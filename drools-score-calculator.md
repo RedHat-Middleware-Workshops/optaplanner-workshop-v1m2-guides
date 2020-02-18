@@ -124,18 +124,23 @@ In the action part, the consequence that fires when the rule matches, we call th
 
 
 ~~~
+18:57:56.377 [main] INFO org.optaplanner.core.impl.solver.DefaultSolver - Solving ended: time spent (5000), best score (0hard/-132300soft), score calculation speed (8197/sec), phase total (2), environment mode (REPRODUCIBLE).
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 8.146 sec
 
-Bla
+Results :
 
+Tests run: 2, Failures: 0, Errors: 0, Skipped: 0
 
+.................
+.................
 
-
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  13.420 s
+[INFO] Finished at: 2020-02-18T18:57:56+01:00
+[INFO] ------------------------------------------------------------------------
 ~~~
-
-
-
-
-
 
 Your final `.drl` file should look like this:
 
