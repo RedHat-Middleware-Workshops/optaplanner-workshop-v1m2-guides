@@ -1,22 +1,34 @@
-# Drools Score Calculator
+# Constraint Streams Score Calculator
 
 In this section you will learn
 
-1. How to integrate OptaPlanner with Drools.
-2. How to write constraints in the Drools Rule Language (DRL).
+1. What the OptaPlanner Constraint Streams API is.
+2. How to write constraints using Constraint Streams.
 
-In the previous lab we've implemented an _Easy Score Calculator_ in Java. As we stated earlier, these kind of score calculators recalculate the score from scratch on every _move_ performed by OptaPlanner. This makes the score calculation extremely slow. In production scenarios, a high _Score Calculation Count (SCC)_ is extremely important in order to be able to handle real-life problems and problem sizes.
+In the previous lab we've implemented an _Drools Score Calculator_ in Drools rules. The Drools score calculator is an incremental score calculator that only calculates score delta's for OptaPlanner moves, which makes score calculation fast. However, a disadvantage of Drools can be that one has to learn a new language, namely DRL (Drools Rule Language).
 
-In this module we will look at Drools, an extremely high performant, light-weight, rules engine. Drools provides implicit support for incremental score calculation. Second, constraints can be implemented in individual, de-coupled, rules, which makes implementing, reasoning over, and maintaining constraint rules easier than when using a Java-based score-calculator.
+To overcome this challenge, and to accomodate for developers that are like and are used to the Java Streams API, OptaPlanner comes with the _Constraint Streams_ API. Constraint streams are a Functional Programming form of incremental score calculation in plain Java that is easy to read, write and debug. The API should feel familiar if you’ve worked with Java 8 Streams or SQL. Under the covers, constraint streams are transpiled into the Drools Canonical Model, and hence, use the Drools high performant rules execution engine at runtime.
+
+In this module you will write the constraint rules of  our Cloud Balancing problem in Constraint Streams.
 
 
-## Drools Score Calculator
+## Constraint Streams
 
-There are multiple ways in which we can utilize Drools rules in OptaPlanner. We can simply load the rules from a `.drl` (Drools Rule Language) file in our application, or we can separate the rules from our application and package them in a, so called, `KJAR` or _Knowledge JAR_.
-
-In this lab we will define our rules in a `.drl` file.
+As stated, Constraint Streams feel similar to the Java 8 Streams API and follow a functional programming paradigm. Let's write our constraint rules in Constraint Streams.
 
 1. Open CodeReady Workspaces and open your project from the previous lab. You can also import the following project from GitHub and use it as a starting point for this module: [https://github.com/RedHat-Middleware-Workshops/optaplanner-workshop-v1m2-labs-step-2](https://github.com/RedHat-Middleware-Workshops/optaplanner-workshop-v1m2-labs-step-2)
+
+
+
+
+
+
+
+
+
+
+
+
 
 2. In the `src/main/resources/org/optaplannner/examples/cloudbalancing/solver` directory, create a new file called `cloudBalancingScoreRules.drl`.
 

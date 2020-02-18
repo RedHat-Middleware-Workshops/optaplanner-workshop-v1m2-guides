@@ -8,5 +8,7 @@ modules:
     name: Easy Java Score Calculator
   drools-score-calculator:
     name: Drools Score Calculator
+  constraint-streams-score-calculator:
+    name: Constraint Streams Score Calculator
   finish:
     name: Conclusion

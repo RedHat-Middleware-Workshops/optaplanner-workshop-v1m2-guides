@@ -32,4 +32,5 @@ modules:
   - intro
   - easy-java-score-calculator
   - drools-score-calculator
+  - constraint-streams-score-calculator
   - finish

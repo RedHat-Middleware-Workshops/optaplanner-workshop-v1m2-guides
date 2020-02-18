@@ -60,7 +60,7 @@ Let's first implement the logic to determine which `CloudProcess` has been assig
 
 2. The solution should look like this:
 
-```
+~~~java
 public HardSoftScore calculateScore(CloudBalance cloudBalance) {
   int hardScore = 0;
   int softScore = 0;
@@ -80,8 +80,7 @@ public HardSoftScore calculateScore(CloudBalance cloudBalance) {
   }
   return HardSoftScore.of(hardScore, softScore);
 }
-
-```
+~~~
 
 Although we have defined the logic that collects the resource requirements of our _processes_ per _computer_, we have not yet implemented any constraints. Lets' first implement the _hard constraints_. When looking at the requirements we can identify 3 _hard constraints_:
 
@@ -96,12 +95,12 @@ Although we have defined the logic that collects the resource requirements of ou
 
 2. A possible solution is show below. In this
 
-```
+~~~java
 int cpuPowerAvailable = computer.getCpuPower() - cpuPowerUsage;
 if (cpuPowerAvailable < 0) {
   hardScore += cpuPowerAvailable;
 }
-```
+~~~
 
 3. Implement the other 2 hard constrains in the same way.
 
@@ -111,7 +110,7 @@ if (cpuPowerAvailable < 0) {
 
 4. The full solution of the _hard constraint_ implementation looks like this:
 
-```
+~~~java
 public HardSoftScore calculateScore(CloudBalance cloudBalance) {
   int hardScore = 0;
   int softScore = 0;
@@ -145,8 +144,7 @@ public HardSoftScore calculateScore(CloudBalance cloudBalance) {
     }
     return HardSoftScore.of(hardScore, softScore);
 }
-
-```
+~~~
 
 With our hard constraints implemented, we can now look at our _soft constraints_. The _soft constraints_ are the constraints we want to optimize on. Usually a planning problem has many soft constraints, but in this case we will only implement one: _the costs_ of our _computers_. (Another possible _soft constraint_ of our use-case could be to reach a 80% resource utilization of our _computers_ to make sure we can safely accomadate for peaks).
 
@@ -161,7 +159,7 @@ Analysing the _soft constraint_, we can see that we have to _minimize_ the _cost
 2. The possible full solution of our score calculation method is the following. Note the `used` boolean that is introduced to keep track of which `CloudComputers` are used. This allows us to easily determine which `CloudComputer` is used, and therefore, which `cost` we need to add to our _soft constraint_.
 
 
-```
+~~~java
 public HardSoftScore calculateScore(CloudBalance cloudBalance) {
   int hardScore = 0;
   int softScore = 0;
@@ -202,8 +200,7 @@ public HardSoftScore calculateScore(CloudBalance cloudBalance) {
   }
   return HardSoftScore.of(hardScore, softScore);
 }
-
-```
+~~~
 
 Now that we've implemented both the _hard constraints_ and _soft constraints_ of our solution, we can test our application again.
 
@@ -211,9 +208,9 @@ Now that we've implemented both the _hard constraints_ and _soft constraints_ of
 
 Observe that the debug output of our unit-test now shows a soft score that is -7410 soft:
 
-```
+~~~
 14:08:39.973 [main] DEBUG org.optaplanner.core.impl.localsearch.DefaultLocalSearchPhase -     LS step (0), time spent (28), score (0hard/-7410soft),     best score (0hard/-7410soft), accepted/selected move count (1/8), picked move (org.optaplanner.examples.cloudbalancing.domain.CloudProcess@126253fd
-```
+~~~
 
 Also note that we don't see any _hard constraints_ being broken, nor any improvement in the _soft score_. This is due to the fact that we have a very small problem with only 4 computers and 12 processes. Let's add a bigger problem to our workspace so we can see OptaPlanner's optimization algorithms in action.
 
@@ -227,9 +224,9 @@ Also note that we don't see any _hard constraints_ being broken, nor any improve
 
 When we now observe the output, we can see that OptaPlanner is constantly finding better and better solutions (solutions with a lower _soft score_) to our problem. We can also see that when OptaPlanner finds a better solution than the current _best solution_, it prints the following statement:
 
-```
+~~~
 15:24:51.930 [main] DEBUG org.optaplanner.core.impl.localsearch.DefaultLocalSearchPhase -     LS step (2230), time spent (1440), score (0hard/-132300soft), new best score (0hard/-132300soft), accepted/selected move count (1/2), picked move (org.optaplanner.examples.cloudbalancing.domain.CloudProcess@10ded6a9 {org.optaplanner.examples.cloudbalancing.domain.CloudComputer@7f2cfe3f -> org.optaplanner.examples.cloudbalancing.domain.CloudComputer@50313382}).
-```
+~~~
 
 Note the sentence _new best score_. This indicates that OptaPlanner has found a better score, and this score will be the new _best_ score. This means that when we stop the solver, this solution will be returned.
 
