@@ -206,7 +206,7 @@ We have to _minimize_ the _cost_ of our solution. We have to pay for a `CloudCom
     **SOLUTION BELOW** ... Try not to cheat!
 
 
-2. The soft constraint can be implemented as show below. Note the use of the `exists` keyword. The reason for using this keyword is that the costs of a computer should only be added to the soft constraint score once, even if there is more than one process assigned to the computer. The `exists` keyword basically controls that this rule is only fired once, even of there are multiple processes assigned to the computer.
+2. The soft constraint can be implemented as shown below. Note the use of the `exists` keyword. The reason for using this keyword is that the costs of a computer should only be added to the soft constraint score once, even if there is more than one process assigned to the computer. The `exists` keyword basically controls that this rule is only fired once, even of there are multiple processes assigned to the computer.
 
 ~~~
 rule "computerCost"
