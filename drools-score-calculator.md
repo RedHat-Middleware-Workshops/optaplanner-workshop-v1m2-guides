@@ -100,9 +100,9 @@ rule "requiredCpuPowerTotal"
 end
 ~~~
 
-Let's first explain the _left-hand-side_ of the rule. The first line matches on eveyr `CloudComputer` _Fact_. The `$computer :` and `$cpuPower :` are variable assignments. This allows us to later reference the `CloudComputer` and its `cpuPower` attribute in another constraint, or in the action part of our rule.
+Let's first explain the _left-hand-side_ of the rule. The first line matches on every `CloudComputer` _Fact_. The `$computer :` and `$cpuPower :` are variable assignments. This allows us to later reference the `CloudComputer` and its `cpuPower` attribute in another constraint, or in the action part of our rule.
 
-The `accumulate` is a keyword to use the built-in accumulate function in Drools. Accumulates allow us to accumulate multiple facts that match one or more conditions and apply functions to them. In this case our `accumulate` function collects all the `CloudProcess` facts of which the assigned `CloudComputer` is equal to the `CloudComputer` we matched in the firt condition of our rule. In other words, we collect all `CloudProcess` facts assigned to this `CloudComputer`. Next, we use the `sum` function of out `accumulate` to sum up the total required `cpuPower` of all processes combined. Finally, we apply the conditiion in which we check that the sum of `requiredCpuPower` is higher than the computer's available `cpuPower`. When that constraint matches, our rule fires. Note that sum of `requiredCpuPower` is also assigned to a variable, i.e. '$requiredCpuPowerTotal'. This allows us to use this variable in the action part of our rule.
+The `accumulate` is a keyword to use the built-in accumulate function in Drools. Accumulates allow us to accumulate multiple facts that match one or more conditions and apply functions to them. In this case our `accumulate` function collects all the `CloudProcess` facts of which the assigned `CloudComputer` is equal to the `CloudComputer` we matched in the first condition of our rule. In other words, we collect all `CloudProcess` facts assigned to this `CloudComputer`. Next, we use the `sum` function of out `accumulate` to sum up the total required `cpuPower` of all processes combined. Finally, we apply the condition in which we check that the sum of `requiredCpuPower` is higher than the computer's available `cpuPower`. When that constraint matches, our rule fires. Note that sum of `requiredCpuPower` is also assigned to a variable, i.e. '$requiredCpuPowerTotal'. This allows us to use this variable in the action part of our rule.
 
 In the action part, the consequence that fires when the rule matches, we call the `addHardConstraintMatch` of our `scoreHolder` to add a negative hard constraint score. As in our _Easy Score Calculator_, we set the _hard score_ as a negative value, i.e. the amount of missing `cpuPower`.
 
@@ -120,8 +120,6 @@ In the action part, the consequence that fires when the rule matches, we call th
 ~~~
 
 3. Run the `CloudBalancingSolverTest` by running a Maven Build. The output should show the test being executed.
-
-
 
 ~~~
 18:57:56.377 [main] INFO org.optaplanner.core.impl.solver.DefaultSolver - Solving ended: time spent (5000), best score (0hard/-132300soft), score calculation speed (8197/sec), phase total (2), environment mode (REPRODUCIBLE).
@@ -141,6 +139,85 @@ Tests run: 2, Failures: 0, Errors: 0, Skipped: 0
 [INFO] Finished at: 2020-02-18T18:57:56+01:00
 [INFO] ------------------------------------------------------------------------
 ~~~
+
+We can see that the test runs successfully. We can also see that we have `0hard/0soft` score. The reason for this is that we've not yet implemented all our constraints, and with the current solution that OptaPlanner finds, the hard constraint we've implemented is not broken.
+
+We can now implement the other 2 hard constraints, the one for `memory` and `networkBandwidth` in the exact same way
+
+4. Implement the other 2 hard constrains in the same way.
+
+
+    **SOLUTION BELOW** ... Try not to cheat!
+
+
+5. The full DRL solution of the _hard constraint_ implementation looks like this:
+
+~~~
+rule "requiredCpuPowerTotal"
+    when
+        $computer : CloudComputer($cpuPower : cpuPower)
+        accumulate(
+            CloudProcess(
+                computer == $computer,
+                $requiredCpuPower : requiredCpuPower);
+            $requiredCpuPowerTotal : sum($requiredCpuPower);
+            $requiredCpuPowerTotal > $cpuPower
+        )
+    then
+        scoreHolder.addHardConstraintMatch(kcontext, $cpuPower - $requiredCpuPowerTotal);
+end
+
+rule "requiredMemoryTotal"
+    when
+        $computer : CloudComputer($memory : memory)
+        accumulate(
+            CloudProcess(
+                computer == $computer,
+                $requiredMemory : requiredMemory);
+            $requiredMemoryTotal : sum($requiredMemory);
+            $requiredMemoryTotal > $memory
+        )
+    then
+        scoreHolder.addHardConstraintMatch(kcontext, $memory - $requiredMemoryTotal);
+end
+
+rule "requiredNetworkBandwidthTotal"
+    when
+        $computer : CloudComputer($networkBandwidth : networkBandwidth)
+        accumulate(
+            CloudProcess(
+                computer == $computer,
+                $requiredNetworkBandwidth : requiredNetworkBandwidth);
+            $requiredNetworkBandwidthTotal : sum($requiredNetworkBandwidth);
+            $requiredNetworkBandwidthTotal > $networkBandwidth
+        )
+    then
+        scoreHolder.addHardConstraintMatch(kcontext, $networkBandwidth - $requiredNetworkBandwidthTotal);
+end
+~~~
+
+With our hard constraints implemented, we can now look at our _soft constraints_. As in the previous lab, the _soft constraints_ are the constraints we want to optimize on. In this case we will only implement one: _the costs_ of our _computers_. (as said before, another possible _soft constraint_ of our use-case could be to reach a 80% resource utilization of our _computers_ to make sure we can safely accomadate for peaks).
+
+We have to _minimize_ the _cost_ of our solution. We have to pay for a `CloudComputer` when at least one `CloudProcess` has been assigned to it.
+
+1. Implement the _soft constraint_ of our planning problem.
+
+
+    **SOLUTION BELOW** ... Try not to cheat!
+
+
+2. The soft constraint can be implemented as show below. Note the use of the `exists` keyword. The reason for using this keyword is that the costs of a computer should only be added to the soft constraint score once, even if there is more than one process assigned to the computer. The `exists` keyword basically controls that this rule is only fired once, even of there are multiple processes assigned to the computer.
+
+~~~
+rule "computerCost"
+    when
+        $computer : CloudComputer($cost : cost)
+        exists CloudProcess(computer == $computer)
+    then
+        scoreHolder.addSoftConstraintMatch(kcontext, - $cost);
+end
+~~~
+
 
 Your final `.drl` file should look like this:
 
@@ -213,5 +290,31 @@ rule "computerCost"
         scoreHolder.addSoftConstraintMatch(kcontext, - $cost);
 end
 ~~~
+
+We can now test our solution:
+
+1. With the constraint rules fully implemented, run another Maven build that will execute the tests.
+
+2. If the test executes correctly, you should see that the Solver will end after 5 seconds (5000 milliseconds), with (in this example run) a best score of `(0hard/-128680soft)`:
+
+~~~~
+14:48:57.832 [main] INFO org.optaplanner.core.impl.solver.DefaultSolver - Solving ended: time spent (5000), best score (0hard/-128680soft), score calculation speed (18744/sec), phase total (2), environment mode (REPRODUCIBLE).
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 5.44 sec
+
+Results :
+
+Tests run: 2, Failures: 0, Errors: 0, Skipped: 0
+
+.......
+.......
+
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  9.067 s
+[INFO] Finished at: 2020-02-19T14:48:58+01:00
+[INFO] ------------------------------------------------------------------------
+~~~
+
 
 You've successfully implemented your _hard constraints_ and _soft constraints_ in Drools. In the next part of the lab, we will implement the same constraints with the OptaPlanner _Constraint Streams_ API. The _Constraint Streams_ API allows developers to write OptaPlanner constraints in a Java 8 Streams like, functional programming, paradigm. This reduces the learning curve of writing constraints. At the same time, these constraint streams are transpiled to the Drools Canonical Model, therefore using the high-performant Drools rules engine for constraint evaluation at runtime.
